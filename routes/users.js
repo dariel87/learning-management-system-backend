@@ -16,7 +16,7 @@ router.get('/', async (req, res, next) => {
  * CREATE RECORD
  */
 router.post('/', async (req, res, next) => {
-    const { username, name, email, password} = req.body;
+    const { username, name, email, password, role} = req.body;
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -26,6 +26,7 @@ router.post('/', async (req, res, next) => {
             username,
             name,
             email,
+            role,
             password: hashedPassword
         });
 
@@ -70,7 +71,7 @@ router.get('/:id', async (req, res, next) => {
  */
 router.put('/:id', async (req, res, next) => {
     const { id } = req.params;
-    const { name, email} = req.body;
+    const { name, email, role} = req.body;
 
     try { 
         const user = await User.findByPk(id);
@@ -81,6 +82,7 @@ router.put('/:id', async (req, res, next) => {
 
         user.name = name;
         user.email = email;
+        user.role = role;
         await user.save();
 
         res.send({

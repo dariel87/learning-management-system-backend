@@ -13,11 +13,13 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
         }
     }
+
     User.init({
         username: DataTypes.STRING,
         password: DataTypes.STRING,
         name: DataTypes.STRING,
-        email: DataTypes.STRING
+        email: DataTypes.STRING,
+        role: DataTypes.STRING
     }, {
         sequelize,
         modelName: 'User',
@@ -29,5 +31,6 @@ module.exports = (sequelize, DataTypes) => {
             withPassword: { attributes: { include: ["password"] } } // ✅ Allow retrieving password if needed
         }
     });
+    
     return User;
 };
