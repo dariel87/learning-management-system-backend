@@ -4,11 +4,11 @@ const { sequelize, Kelas, KelasTeacher, User, AcademicYear } = require("../model
 const include = [{
     model: KelasTeacher,
     as: 'teachers',
-    attributes: ['teacher_id', 'is_main'],
+    attributes: ['id', 'teacher_id', 'is_main'],
     include: {
         model: User,
         as: 'user',
-        attributes: ['name']
+        attributes: ['id', 'name']
     }
 }, {
     model: AcademicYear,
@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
         let teacherData = teachers.map(t => {
             return {
                 kelas_id: kelas.id,
-                teacher_id: t.id,
+                teacher_id: t.teacher_id,
                 is_main: t.is_main
             };
         });
@@ -101,26 +101,73 @@ router.get('/:id', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, academic_year_id, teachers } = req.body;
+
+    const transaction = await sequelize.transaction();
 
     try { 
-        const subject = await Subject.findByPk(id);
+        const kelas = await Kelas.findByPk(id, {
+            transaction
+        });
 
-        if(subject === null){
-            throw new Error('Subject not found');
+        if(kelas === null){
+            throw new Error('Class not found');
         }
 
-        subject.name = name;
-        await subject.save();
+        kelas.name = name;
+        kelas.academic_year_id = academic_year_id;
+        await kelas.save({ transaction });
+
+        const existing_teachers = await KelasTeacher.findAll({
+            where: {
+                kelas_id: id
+            }
+        }, {
+            transaction
+        });
+
+        const existing_teachers_id = existing_teachers.map(t => t.teacher_id);
+
+        console.log(existing_teachers_id);
+
+        for(let teacher of teachers){
+            console.log(teacher);
+            if(existing_teachers_id.indexOf(teacher.teacher_id) > -1){
+                const kt = await KelasTeacher.findByPk(teacher.id, {
+                    transaction
+                })
+
+                if(kt === null){
+                    throw new Error("Model not found");
+                }
+
+                kt.teacher_id = teacher.teacher_id;
+                kt.kelas_id = id;
+                kt.is_main = teacher.is_main;
+                await kt.save({ transaction });
+            }else{
+                await KelasTeacher.create({
+                    kelas_id: id,
+                    teacher_id: teacher.teacher_id,
+                    is_main: teacher.is_main
+                }, {
+                    transaction
+                });
+            }
+        }
+
+        await transaction.commit();
 
         res.send({
             error: 0,
-            message: 'Subject updated successfully'
+            message: 'Class updated successfully'
         })
     } catch(e) {
+        await transaction.rollback();
+
         res.status(500).send({
             error: 1,
-            message: 'Failed updating subject. ' + e
+            message: 'Failed updating class. ' + e
         })
     }
 });
@@ -129,22 +176,22 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try { 
-        const subject = await Subject.findByPk(id);
+        const kelas = await Kelas.findByPk(id);
 
-        if(subject === null){
-            throw new Error('Subject not found');
+        if(kelas === null){
+            throw new Error('Class not found');
         }
 
-        await subject.destroy();
+        await kelas.destroy();
 
         res.send({
             error: 0,
-            message: 'Subject updated successfully'
+            message: 'Class deleted successfully'
         })
     } catch(e) {
         res.status(500).send({
             error: 1,
-            message: 'Failed deleting subject. ' + e
+            message: 'Failed deleting class. ' + e
         })
     }
 })

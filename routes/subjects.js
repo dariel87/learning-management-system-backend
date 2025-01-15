@@ -99,7 +99,7 @@ router.delete('/:id', async (req, res) => {
 
         res.send({
             error: 0,
-            message: 'Subject updated successfully'
+            message: 'Subject deleted successfully'
         })
     } catch(e) {
         res.status(500).send({

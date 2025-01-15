@@ -112,7 +112,7 @@ router.delete('/:id', async (req, res, next) => {
 
         res.send({
             error: 0,
-            message: 'User updated successfully'
+            message: 'User deleted successfully'
         })
     } catch(e) {
         console.log(e);
