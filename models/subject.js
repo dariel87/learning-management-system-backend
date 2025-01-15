@@ -14,7 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
     Subject.init({
-        name: DataTypes.STRING
+        name: DataTypes.STRING,
+        type: {
+            type: DataTypes.ENUM('regular', 'extracurricular', 'break'),
+            allowNull: false,
+            defaultValue: "user" // Optional: Default value
+        }
     }, {
         sequelize,
         modelName: 'Subject',

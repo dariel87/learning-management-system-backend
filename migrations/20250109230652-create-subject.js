@@ -12,6 +12,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      type: {
+        type: Sequelize.ENUM('regular', 'extracurricular', 'break'),
+        allowNull: false
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE

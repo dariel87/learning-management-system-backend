@@ -2,32 +2,46 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('kelas', {
+    await queryInterface.createTable('kelas_subjects', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      academic_year_id: {
+      kelas_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: {
-            tableName: 'academic_years'
+            tableName:'kelas'
           },
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
-      is_active: {
+      subject_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        type:Sequelize.BOOLEAN,
-        defaultValue: true
+        references: {
+          model: {
+            tableName:'subjects'
+          },
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
+      },
+      day: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      start_time: {
+        type: Sequelize.TIME,
+        allowNull: false
+      },
+      end_time: {
+        type: Sequelize.TIME,
+        allowNull: false
       },
       created_at: {
         allowNull: false,
@@ -40,6 +54,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('kelas');
+    await queryInterface.dropTable('kelas_subjects');
   }
 };

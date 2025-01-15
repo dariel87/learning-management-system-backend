@@ -21,7 +21,7 @@ const include = [{
  */
 router.get('/', async (req, res) => {
     const classes = await Kelas.findAll({
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'is_active'],
         include
     });
 
@@ -32,14 +32,15 @@ router.get('/', async (req, res) => {
  * CREATE RECORD
  */
 router.post('/', async (req, res) => {
-    const { name, academic_year_id, teachers } = req.body;
+    const { name, academic_year_id, is_active, teachers } = req.body;
 
     const transaction = await sequelize.transaction();
 
     try {
         const kelas = await Kelas.create({
             name,
-            academic_year_id
+            academic_year_id,
+            is_active: !!is_active
         }, {
             transaction
         });
@@ -101,7 +102,7 @@ router.get('/:id', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, academic_year_id, teachers } = req.body;
+    const { name, academic_year_id, is_active, teachers } = req.body;
 
     const transaction = await sequelize.transaction();
 
@@ -116,6 +117,7 @@ router.put('/:id', async (req, res) => {
 
         kelas.name = name;
         kelas.academic_year_id = academic_year_id;
+        kelas.is_active = !!is_active
         await kelas.save({ transaction });
 
         const existing_teachers = await KelasTeacher.findAll({

@@ -15,11 +15,12 @@ router.get('/', async (req, res) => {
  * CREATE RECORD
  */
 router.post('/', async (req, res) => {
-    const { name } = req.body;
+    const { name, type } = req.body;
 
     try {
         await Subject.create({
-            name
+            name,
+            type
         });
 
         res.send({
@@ -61,7 +62,7 @@ router.get('/:id', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, type } = req.body;
 
     try { 
         const subject = await Subject.findByPk(id);
@@ -71,6 +72,7 @@ router.put('/:id', async (req, res) => {
         }
 
         subject.name = name;
+        subject.type = type;
         await subject.save();
 
         res.send({

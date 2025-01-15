@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
 
     Kelas.init({
         name: DataTypes.STRING,
-        academic_year_id: DataTypes.INTEGER
+        academic_year_id: DataTypes.INTEGER,
+        is_active: DataTypes.BOOLEAN
     }, {
         sequelize,
         modelName: 'Kelas',
