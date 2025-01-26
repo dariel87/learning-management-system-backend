@@ -6,9 +6,30 @@ const { Subject } = require("../models");
  * LIST RECORDS
  */
 router.get('/', async (req, res) => {
-    const subjects = await Subject.findAll();
+    const { per_page = 2, page = 1, all} = req.query;
+    let subjects;
 
-    res.send(subjects);
+    try {
+        if(all){
+            subjects = await Subject.findAll();
+    
+            res.send(subjects);
+        }else{
+            subjects = await Subject.findAndCountAll({
+                limit: parseInt(per_page),
+                offset: parseInt(per_page) * (parseInt(page) - 1) 
+            });
+    
+            subjects.total_pages = Math.ceil(subjects.count / parseInt(per_page));
+    
+            res.send(subjects);
+        }
+    } catch(e) {
+        res.header(500).send({
+            error: 1,
+            message: 'Failed fetch users'
+        })
+    }
 });
 
 /**

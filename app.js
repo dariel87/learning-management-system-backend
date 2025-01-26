@@ -3,7 +3,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-var bodyParser = require("body-parser");
 var swaggerJsdoc = require("swagger-jsdoc");
 var swaggerUi = require("swagger-ui-express");
 
@@ -11,18 +10,16 @@ const options = {
     definition: {
         openapi: "3.1.0",
         info: {
-            title: "LogRocket Express API with Swagger",
+            title: "LMS Express API with Swagger",
             version: "0.1.0",
-            description:
-                "This is a simple CRUD API application made with Express and documented with Swagger",
+            description: "LMS API application made with Express and documented with Swagger",
             license: {
                 name: "MIT",
                 url: "https://spdx.org/licenses/MIT.html",
             },
             contact: {
-                name: "LogRocket",
-                url: "https://logrocket.com",
-                email: "info@email.com",
+                name: "Dariel Pratama Adipura",
+                email: "lamer.idiot@gmail.com",
             },
         },
         servers: [

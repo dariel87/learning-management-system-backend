@@ -6,9 +6,30 @@ const { AcademicYear } = require("../models");
  * LIST RECORDS
  */
 router.get('/', async (req, res) => {
-    const years = await AcademicYear.findAll();
+    const { per_page = 10, page = 1, all} = req.query;
+    let years;
 
-    res.send(years);
+    try {
+        if(all){
+            years = await AcademicYear.findAll();
+    
+            res.send(years);
+        }else{
+            years = await AcademicYear.findAndCountAll({
+                limit: parseInt(per_page),
+                offset: parseInt(per_page) * (parseInt(page) - 1) 
+            });
+    
+            years.total_pages = Math.ceil(years.count / parseInt(per_page));
+    
+            res.send(years);
+        }
+    } catch(e) {
+        res.header(500).send({
+            error: 1,
+            message: 'Failed fetch users'
+        })
+    }
 });
 
 /**
