@@ -6,16 +6,44 @@ const { User } = require("../models");
 /**
  * LIST RECORDS
  */
-router.get('/', async (req, res, next) => {
-    const users = await User.findAll();
+router.get('/', async (req, res) => {
+    const { per_page = 10, page = 1, all, role} = req.query;
+    let users;
 
-    res.send(users);
+    try {
+        if(all){
+            if(!role) {
+                throw new Error('role should be included while calling all')
+            }
+            users = await User.findAll({
+                where: {
+                    role
+                }
+            });
+    
+            res.send(users);
+        }else{
+            users = await User.findAndCountAll({
+                limit: parseInt(per_page),
+                offset: parseInt(per_page) * (parseInt(page) - 1) 
+            });
+    
+            users.total_pages = Math.ceil(users.count / parseInt(per_page));
+    
+            res.send(users);
+        }
+    } catch(e) {
+        res.status(500).send({
+            error: 1,
+            message: `Failed fetch users. ${e}`
+        })
+    }
 });
 
 /**
  * CREATE RECORD
  */
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
     const { username, name, email, password, role} = req.body;
     const saltRounds = 10;
 
@@ -46,7 +74,7 @@ router.post('/', async (req, res, next) => {
 /**
  * GET RECORD DETAIL
  */
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     try { 
@@ -69,7 +97,7 @@ router.get('/:id', async (req, res, next) => {
 /**
  * UPDATE RECORD
  */
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, role} = req.body;
 
@@ -98,7 +126,7 @@ router.put('/:id', async (req, res, next) => {
     }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try { 

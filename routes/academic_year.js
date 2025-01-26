@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
             res.send(years);
         }
     } catch(e) {
-        res.header(500).send({
+        res.status(500).send({
             error: 1,
             message: 'Failed fetch users'
         })
